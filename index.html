@@ -508,16 +508,31 @@
 <div class="confetti-container" id="confettiContainer"></div>
 
 <script>
-const STORAGE_KEY = "love-bingo-revealed";
+const STORAGE_KEY = "love-bingo-state";
 function saveState() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify([...revealedCells])); } catch(e) {}
+  try {
+    const data = {
+      cardData: cardData,
+      revealed: [...revealedCells],
+      bingoDetected: bingoDetected
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch(e) {}
 }
 function loadState() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) { const arr = JSON.parse(saved); if (Array.isArray(arr)) return new Set(arr); }
+    if (saved) {
+      const data = JSON.parse(saved);
+      if (data && Array.isArray(data.cardData) && data.cardData.length === 24 && Array.isArray(data.revealed)) {
+        cardData = data.cardData;
+        revealedCells = new Set(data.revealed);
+        bingoDetected = !!data.bingoDetected;
+        return true;
+      }
+    }
   } catch(e) {}
-  return new Set();
+  return false;
 }
 function shareBingo() {
   const count = revealedCells.size;
@@ -527,10 +542,10 @@ function shareBingo() {
 }
 function resetGame() {
   if (!confirm("确定重置？所有进度将丢失！")) return;
-  revealedCells.clear(); bingoDetected = false; localStorage.removeItem(STORAGE_KEY);
+  revealedCells.clear(); bingoDetected = false; cardData = []; localStorage.removeItem(STORAGE_KEY);
   document.getElementById("modalOverlay").classList.remove("show");
   document.getElementById("confettiContainer").innerHTML = "";
-  initGrid();
+  newCard();
 }
 
 // 情侣任务文案
@@ -619,7 +634,14 @@ let bingoDetected = false;
 
 // 初始化
 function initGrid() {
-  newCard();
+  if (loadState()) {
+    // 恢复上次进度
+    renderGrid();
+    updateProgress();
+    document.getElementById('couponSerial').textContent = 'NO.' + generateSerial();
+  } else {
+    newCard();
+  }
 }
 
 // 生成新卡片
@@ -631,6 +653,7 @@ function newCard() {
   cardData = shuffled.slice(0, 24);
   renderGrid();
   updateProgress();
+  saveState();
   // 重新生成序列号
   document.getElementById('couponSerial').textContent = 'NO.' + generateSerial();
 }
@@ -641,6 +664,7 @@ function resetCard() {
   bingoDetected = false;
   renderGrid();
   updateProgress();
+  saveState();
 }
 
 // 渲染网格
