@@ -1,0 +1,49 @@
+{
+  "name": "恋爱刮刮 Bingo · 情侣专属心动卡",
+  "short_name": "恋爱Bingo",
+  "description": "刮开 24 件心动小事，连成一线换一张奖励券。可定制名字、任务、奖励券和合照背景，纯前端、可离线。",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "start_url": "./#/",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#fff2f7",
+  "theme_color": "#e8507e",
+  "categories": ["games", "lifestyle", "entertainment"],
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "开始刮卡",
+      "short_name": "刮卡",
+      "url": "./#/play",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "制作者工作台",
+      "short_name": "工作台",
+      "url": "./#/studio",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

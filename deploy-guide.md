@@ -1,116 +1,95 @@
-# 🚀 部署指南 — 恋爱刮刮 Bingo
+# 🚀 部署指南 · 恋爱刮刮 Bingo
 
-本文档指导你将游戏发布为**人人可访问的网页**，无需服务器，完全免费。
+这是一个**纯静态站点**：没有构建步骤、没有后端、没有依赖，把一个目录丢上去就能跑。
+下面的方案都是免费的，选一个即可。
 
 ---
 
-## 方案一：GitHub Pages（推荐，最稳定）
+## 方案一：GitHub Pages（推荐）
 
-### 前置条件
-1. 注册 [GitHub](https://github.com) 账号
-2. 下载安装 [Git](https://git-scm.com/downloads)
+### 用自带的工作流（最省事）
 
-### 步骤
+仓库里已经放了 `.github/workflows/pages.yml`，推到默认分支（`main` 或 `master`）就会自动部署。
 
-```bash
-# 1. 在 GitHub 新建仓库（例如 love-bingo），不要勾选 README
+1. 把代码推到 GitHub 仓库的 `main` 分支。
+2. 打开仓库 **Settings → Pages**，把 **Source** 设为 **GitHub Actions**。
+3. 等 Actions 跑完（约 30 秒），访问：
 
-# 2. 在本地执行
-cd D:\workspace\Project11-love-bingo
-git init
-git add index.html
-git commit -m "🎉 初恋刮刮Bingo"
+   ```
+   https://你的用户名.github.io/仓库名/
+   ```
 
-# 3. 关联远程仓库并推送
-git remote add origin https://github.com/你的用户名/love-bingo.git
-git branch -M main
-git push -u origin main
+### 不用 Actions 也行
 
-# 4. 启用 GitHub Pages
-#    仓库页面 → Settings → Pages → Source 选 "Deploy from branch"
-#    Branch 选 main，文件夹选 / (root) → Save
-#    等待 1-2 分钟后访问：
-#    https://你的用户名.github.io/love-bingo/
-```
+**Settings → Pages → Source: Deploy from a branch**，Branch 选默认分支（`main` / `master`），目录选 `/ (root)`，保存即可。
+整个项目使用相对路径，放在子路径（如 `/love-bingo/`）下同样正常。
 
 ### 自定义域名（可选）
-在仓库 Settings → Pages → Custom domain 填写你的域名，
-并在域名 DNS 添加 CNAME 记录指向 `你的用户名.github.io`。
+
+Settings → Pages → Custom domain 填写域名，并在 DNS 添加 CNAME 指向 `你的用户名.github.io`。
+HTTPS 勾上即可。
 
 ---
 
-## 方案二：Vercel（最快，自动 HTTPS）
+## 方案二：Vercel
 
-### 步骤
-1. 注册 [Vercel](https://vercel.com)（可用 GitHub 登录）
-2. 点击 **Add New → Project**
-3. 导入你的 GitHub 仓库（或直接上传文件夹）
-4. Framework Preset 选择 **Other**
-5. 点击 **Deploy**，等待几秒即可获得 `https://love-bingo.vercel.app`
+1. 用 GitHub 登录 [vercel.com](https://vercel.com) → **Add New → Project**。
+2. 导入仓库，Framework Preset 选 **Other**。
+3. Build Command 留空，Output Directory 留空，**Deploy**。
 
-### 优点
-- 自动 HTTPS
-- 全球 CDN 加速
-- 支持自定义域名
+得到 `https://xxx.vercel.app`。以后每次 push 自动更新。
 
 ---
 
-## 方案三：Netlify（拖拽部署）
+## 方案三：Netlify
 
-### 步骤
-1. 注册 [Netlify](https://netlify.com)
-2. 将 `index.html` 拖拽到 Netlify 的 Sites 页面
-3. 几秒后即可获得 `https://随机名称.netlify.app`
-
-### 自定义域名
-Site settings → Domain management → Add custom domain
+1. 登录 [netlify.com](https://netlify.com) → **Add new site → Import an existing project**。
+2. 选 GitHub 仓库，Build command 留空，Publish directory 填 `.`。
+3. Deploy。或者直接把整个文件夹拖进 Netlify Drop。
 
 ---
 
-## 方案四：本地局域网分享（无需注册）
+## 方案四：局域网 / 本地演示
 
-如果只是想在同一 WiFi 下让朋友访问：
-
-### 使用 Python（无需安装额外工具）
 ```bash
-cd D:\workspace\Project11-love-bingo
+# 在项目根目录
 python -m http.server 8080
-```
-然后局域网内访问 `http://你的IP:8080`
-
-### 使用 Node.js（如果已安装）
-```bash
-npx serve D:\workspace\Project11-love-bingo
+# 或
+npx serve .
 ```
 
----
-
-## 方案五：使用在线工具（零代码）
-
-- **CodePen** — 将 index.html 内容粘贴到 codepen.io → Save → 获得公开链接
-- **JSFiddle** — 同上，jsfiddle.net
-- **GitHub Gist + raw.githack.com** — 创建 Gist → 用 `raw.githack.com` 预览
+手机和电脑连同一个 WiFi，用电脑的局域网 IP 访问，例如 `http://192.168.1.8:8080`。
+第一次分享给 TA 时，这种方式最快。
 
 ---
 
-## 方案对比
+## 部署后需要确认的几件事
 
-| 方案 | 难度 | 速度 | HTTPS | 自定义域名 | 持久性 |
-|------|:----:|:----:|:----:|:---------:|:-----:|
-| GitHub Pages | ⭐⭐ | 快 | ✅ | ✅ | 永久 |
-| Vercel | ⭐ | 很快 | ✅ | ✅ | 永久 |
-| Netlify | ⭐ | 很快 | ✅ | ✅ | 永久 |
-| 局域网分享 | ⭐⭐⭐ | 即时 | ❌ | ❌ | 临时 |
-| CodePen | ⭐ | 即时 | ✅ | ❌ | 长期 |
-
----
-
-## 推荐路线
-
-1. **立即分享** → 用 CodePen 或 Netlify 拖拽部署（2分钟）
-2. **长期使用** → GitHub Pages 或 Vercel（10分钟）
-3. **自定义域名** → GitHub Pages / Vercel + 域名绑定
+| 检查项 | 说明 |
+|---|---|
+| **HTTPS** | PWA 安装、剪贴板复制、系统分享都要求 https（localhost 除外） |
+| **路径** | 所有资源都是相对路径，部署在子目录也没问题 |
+| **OG 图** | `index.html` 里 `og:image` 写死了 `https://kriye-hu.github.io/love-bingo/assets/og-image.png`，换成你的域名 |
+| **Web Share** | 需在手机上用 https 打开；桌面 Chrome 会回退成复制链接 |
+| **离线缓存** | 更新代码后如果页面没变，是 Service Worker 缓存；改 `sw.js` 里的 `VERSION` 即可强制更新 |
+| **分享链接** | 用部署后的域名生成，`#c=` 后面的内容不会发给服务器，隐私安全 |
 
 ---
 
-*更多信息请查看 README.md*
+## 常见问题
+
+**页面空白？**
+用浏览器控制台看是否 404：多半是直接双击 `index.html` 打开了模块或路径大小写不一致。
+
+**改了代码但手机上没变？**
+Service Worker 的缓存策略是「先用缓存、后台更新」，刷新两次或改 `sw.js` 的 `VERSION`。
+
+**手机装不上？**
+iOS 必须用 Safari；微信内置浏览器不支持安装，请用「在浏览器中打开」。
+
+**能多人同时用同一张卡吗？**
+可以，但进度各自独立存在各自手机上，目前不做云端同步。
+
+---
+
+*更多说明见 [README.md](README.md)*

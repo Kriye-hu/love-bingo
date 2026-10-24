@@ -1,0 +1,12 @@
+# 本地开发 / 测试产物
+.chrome-profile*/
+docs/raw/
+*.log
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 依赖（本项目不需要，防止误提交）
+node_modules/
