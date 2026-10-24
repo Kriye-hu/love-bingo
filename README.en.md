@@ -10,7 +10,12 @@
 [![PWA](https://img.shields.io/badge/PWA-offline--ready-1f9e8f.svg)](#install-on-your-phone)
 [![中文 README](https://img.shields.io/badge/README-中文-e8507e.svg)](README.md)
 
-<img src="docs/play.jpg" width="250"> <img src="docs/bingo.jpg" width="250"> <img src="docs/photo-play.jpg" width="250">
+<p align="center">
+  <picture>
+    <source srcset="docs/demo.webp" type="image/webp">
+    <img src="docs/demo.gif" width="300" alt="演示：手指刮开涂层 → 连成一线 → BINGO 开券">
+  </picture>
+</p>
 
 ---
 

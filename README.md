@@ -13,7 +13,12 @@
 
 [![English](https://img.shields.io/badge/README-English-9aa4b2.svg)](README.en.md)
 
-<img src="docs/play.jpg" width="250" alt="刮卡界面"> <img src="docs/bingo.jpg" width="250" alt="BINGO 奖励券"> <img src="docs/photo-play.jpg" width="250" alt="用合照做背景">
+<p align="center">
+  <picture>
+    <source srcset="docs/demo.webp" type="image/webp">
+    <img src="docs/demo.gif" width="300" alt="演示：手指刮开涂层 → 连成一线 → BINGO 开券">
+  </picture>
+</p>
 
 ---
 

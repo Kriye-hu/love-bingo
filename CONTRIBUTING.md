@@ -53,6 +53,13 @@ python tools/build_docs.py   # 压成 README 尺寸
 
 需要本机安装 Chrome；脚本会启动无头浏览器、真实刮格子、开券、生成海报并检查控制台报错。
 
+### 演示动图
+
+```bash
+node tools/demo-gif.mjs      # 录一组帧到 docs/raw/gif
+python tools/build_gif.py    # 合成 docs/demo.gif + docs/demo.webp
+```
+
 ## 提交
 
 一个 PR 只做一件事；标题写清楚改了什么，比如 `feat: 新增「异地恋」任务包`。
