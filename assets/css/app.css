@@ -1298,6 +1298,128 @@ textarea.input { resize: vertical; line-height: 1.5; letter-spacing: 0; }
 .steps li { font-size: .82rem; line-height: 1.6; color: var(--ink-soft); padding-left: 2px; }
 .steps b { color: var(--ink); }
 
+
+/* ---------- 一键模板 ---------- */
+.template-row {
+  display: flex;
+  gap: 9px;
+  overflow-x: auto;
+  padding: 2px 2px 6px;
+  margin: 0 -2px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 26px), transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 26px), transparent 100%);
+}
+.template-row::-webkit-scrollbar { display: none; }
+.template-card {
+  flex: 0 0 auto;
+  width: 128px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  text-align: left;
+  transition: transform .18s ease, border-color .18s ease;
+}
+.template-card:active { transform: scale(.97); border-color: var(--accent-line); }
+.tpl-emoji { font-size: 1.35rem; line-height: 1.15; }
+.tpl-name { font-size: .84rem; font-weight: 800; }
+.tpl-desc { font-size: .62rem; line-height: 1.5; color: var(--ink-faint); }
+
+/* ---------- 回忆册 ---------- */
+[hidden] { display: none !important; }
+
+.memory-dot {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  width: 15px;
+  height: 15px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 4;
+  box-shadow: 0 2px 6px var(--accent-glow);
+}
+
+.memory-slot { margin-top: 14px; }
+.memory-loading { text-align: center; font-size: .72rem; color: var(--ink-faint); padding: 8px 0; }
+.memory-card { display: flex; flex-direction: column; gap: 9px; text-align: left; }
+.memory-photo {
+  width: 100%;
+  max-height: 40vh;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(90, 40, 70, .16);
+}
+.memory-note { font-size: .86rem; line-height: 1.7; color: var(--ink); white-space: pre-wrap; }
+.memory-meta { font-size: .64rem; color: var(--ink-faint); letter-spacing: .04em; }
+
+.checkin-form { display: flex; flex-direction: column; gap: 9px; }
+.checkin-photo {
+  height: 190px;
+  border-radius: 16px;
+  background: var(--input-bg);
+  border: 1px dashed var(--accent-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: var(--ink-faint);
+  font-size: .76rem;
+}
+.checkin-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+.album-body { display: flex; flex-direction: column; gap: 12px; }
+.album-stats { text-align: center; font-size: .76rem; font-weight: 600; color: var(--ink-soft); }
+.album-stats b { color: var(--accent); font-size: 1rem; }
+.album-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.album-item {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  padding: 0;
+  transition: transform .18s ease;
+}
+.album-item:active { transform: scale(.97); }
+.album-item img { width: 100%; height: 100%; object-fit: cover; }
+.album-nophoto {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  background: var(--accent-soft);
+}
+.album-cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 16px 6px 5px;
+  font-size: .56rem;
+  line-height: 1.35;
+  color: #fff;
+  text-align: left;
+  background: linear-gradient(180deg, transparent, rgba(40, 20, 35, .74));
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /* ---------- 响应式 ---------- */
 @media (min-width: 900px) {
   /* 大屏上底纹更克制：降低密度，并在四周柔和淡出 */

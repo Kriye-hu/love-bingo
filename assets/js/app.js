@@ -6,7 +6,7 @@
   'use strict';
 
   const { $, esc, toast, modal, closeModal } = LB.UI;
-  const VERSION = '2.0.0';
+  const VERSION = '2.1.0';
   const REPO = 'github.com/Kriye-hu/love-bingo';
 
   const ctx = { profile: null, state: null, photo: '', meta: null, game: null };
@@ -57,6 +57,12 @@
       if (!ctx.profile) { go('/'); return; }
       ensureGame();
       LB.Player.renderWallet(root);
+      return;
+    }
+    if (path === '/album') {
+      if (!ctx.profile) { go('/'); return; }
+      ensureGame();
+      LB.Player.renderAlbum(root);
       return;
     }
     if (path === '/play') {

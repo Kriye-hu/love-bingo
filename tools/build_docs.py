@@ -33,6 +33,8 @@ SELECT = {
     "20-small": "small",
     "detail-sheet": "detail",
     "desktop": "desktop",
+    "21-memory": "memory",
+    "22-album": "album",
 }
 
 

@@ -191,6 +191,7 @@ async function main() {
     await cdp.send('Runtime.enable');
     await cdp.send('Log.enable');
     await cdp.send('Network.enable');
+    await cdp.send('DOM.enable');
     await cdp.send('Network.setBlockedURLs', { urls: ['*sw.js*'] });
 
     await cdp.send('Emulation.setDeviceMetricsOverride', {
@@ -237,6 +238,44 @@ async function main() {
     await cdp.screenshot('06-line', false);
     results.checks.inLine = await cdp.evaluate('document.querySelectorAll(".cell.in-line").length');
 
+    console.log('6b. 给格子打卡（选照片 + 写一句）');
+    await cdp.evaluate(`document.querySelector('.cell[data-pos="0"]').click()`);
+    await sleep(900);
+    await cdp.evaluate(`document.querySelector('[data-checkin]').click()`);
+    await sleep(500);
+    const docRoot = await cdp.send('DOM.getDocument', { depth: 1 });
+    const inputNode = await cdp.send('DOM.querySelector', { nodeId: docRoot.root.nodeId, selector: '[data-file]' });
+    await cdp.send('DOM.setFileInputFiles', { files: [path.resolve('tools/fixtures/bokeh.jpg')], nodeId: inputNode.nodeId });
+    await sleep(1400);
+    await cdp.evaluate(`(() => {
+      const note = document.querySelector('[data-note]');
+      note.value = '第一次一起看日落，风很大，但你在';
+      note.dispatchEvent(new Event('input', { bubbles: true }));
+      document.querySelector('[data-save]').click();
+      return true;
+    })()`);
+    await sleep(2800);
+    await cdp.screenshot('21-memory', false);
+    results.checks.memorySaved = await cdp.evaluate('!!document.querySelector(".memory-photo")');
+
+    console.log('6c. 回忆册页面');
+    results.checks.seed = await cdp.evaluate(`(async () => {
+      const files = ['/tools/fixtures/mem1.jpg', '/tools/fixtures/mem2.jpg', '/tools/fixtures/mem3.jpg', '/tools/fixtures/mem4.jpg'];
+      const notes = ['第一次一起看日落，风很大，但你在', '你笑起来比晚霞好看', '说好了下次还要来', '今天的天空分你一半'];
+      for (let i = 0; i < files.length; i++) {
+        const blob = await (await fetch(files[i])).blob();
+        const dataUrl = await new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(blob); });
+        await LB.Album.put(LB.App.ctx.profile.uid, i + 1, { photo: dataUrl, note: notes[i] });
+      }
+      return true;
+    })()`);
+    await cdp.evaluate('LB.UI.closeSheet(); location.hash = "#/album"');
+    await sleep(1500);
+    await cdp.screenshot('22-album', false);
+    results.checks.albumItems = await cdp.evaluate('document.querySelectorAll(".album-item").length');
+    await cdp.evaluate('location.hash = "#/play"');
+    await sleep(900);
+
     console.log('7. 券包');
     await cdp.evaluate('location.hash = "#/wallet"');
     await sleep(900);
@@ -276,6 +315,17 @@ async function main() {
     })()`);
     await sleep(900);
     results.checks.autosaveTask = await cdp.evaluate('JSON.parse(localStorage.getItem("lb.profile.v2")).tasks[0]');
+
+    console.log('11b. 一键套用「异地恋」模板');
+    await cdp.evaluate(`document.querySelector('[data-tab="content"]').click()`);
+    await sleep(500);
+    await cdp.evaluate(`document.querySelector('[data-act="apply-template"][data-id="long-distance"]').click()`);
+    await sleep(600);
+    await cdp.evaluate(`document.querySelector('.modal-actions [data-ok]').click()`);
+    await sleep(1000);
+    results.checks.templateTask = await cdp.evaluate('LB.App.ctx.profile.tasks[0]');
+    results.checks.templateCoupons = await cdp.evaluate('LB.App.ctx.profile.coupons.length');
+    results.checks.templateTheme = await cdp.evaluate('LB.App.ctx.profile.theme.id');
 
     console.log('12. 外观页');
     await cdp.evaluate('document.querySelector(\'[data-tab="look"]\').click()');

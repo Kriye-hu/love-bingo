@@ -29,6 +29,8 @@ and you win a coupon (hug coupon, "you pick the next date" coupon, …). Collect
 The **creator** can rewrite everything: names, all 24 tasks, coupons, colors — and use **your own photo as the background**.
 Then share a single link. The other person opens it and the whole card is there. **No sign-up, no server, no tracking.**
 
+After a cell is scratched, tap it to attach a photo and a line — the cards slowly turn into your own **memory album**.
+
 ---
 
 ## Features
@@ -37,11 +39,13 @@ Then share a single link. The other person opens it and the whole card is there.
 |---|---|
 | 👆 **Real scratching** | Canvas coating, finger erase, auto-reveal at 40%; synthesized scratch sound + haptics |
 | 🛠️ **Two roles** | Creator signs in with a local passcode; players pick "who am I" and keep their own progress |
+| 🧩 **One-tap templates** | Long-distance, living together, anniversary, long-term — full task + coupon + theme sets, names and photo preserved |
 | 🔗 **Shareable card link** | Names, tasks, coupons and theme are compressed into the URL (~1.4 KB) |
 | 🔐 **Optional access code** | A 4-digit code if you don't want the link forwarded |
 | 🖼️ **Your photo as background** | Adjustable blur & wash. The photo never leaves the device and is never in the link |
 | 🎨 **5 themes** | Peach, Sakura, Sunset, Mint, Midnight — accent colors and patterns adjustable |
 | 🎟️ **12 lines = 12 coupons** | Multiple simultaneous lines queue up; wallet supports "redeemed" state |
+| 📷 **Memory album** | After scratching, attach a photo and a line to that cell; stored locally in IndexedDB, editable and deletable |
 | 🖼️ **Poster export** | Generates a 1080×1620 share image with highlighted lines |
 | 📴 **Installable & offline** | PWA: add to home screen, full screen, works without network |
 | 🔒 **Private by design** | No accounts, no backend, no analytics, no third-party requests |
@@ -60,7 +64,12 @@ Then share a single link. The other person opens it and the whole card is there.
 <tr>
   <td align="center"><img src="docs/line.jpg" width="230"><br><sub>A completed line</sub></td>
   <td align="center"><img src="docs/wallet.jpg" width="230"><br><sub>Coupon wallet</sub></td>
-  <td align="center"><img src="docs/studio-content.jpg" width="230"><br><sub>Creator studio</sub></td>
+  <td align="center"><img src="docs/studio-content.jpg" width="230"><br><sub>Creator studio + templates</sub></td>
+</tr>
+<tr>
+  <td align="center"><img src="docs/memory.jpg" width="230"><br><sub>Check in a cell</sub></td>
+  <td align="center"><img src="docs/album.jpg" width="230"><br><sub>Memory album</sub></td>
+  <td align="center"><img src="docs/photo-play.jpg" width="230"><br><sub>Your photo as background</sub></td>
 </tr>
 </table>
 

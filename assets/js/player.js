@@ -223,6 +223,10 @@
             '<span class="quick-icon">🎟️</span><span>券包</span>' +
             (stats.awards > 0 ? '<span class="quick-badge">' + stats.awards + '</span>' : '') +
           '</button>' +
+          '<button class="quick-btn" data-action="album">' +
+            '<span class="quick-icon">📷</span><span>回忆</span>' +
+            '<span class="quick-badge" data-memory-badge hidden></span>' +
+          '</button>' +
           '<button class="quick-btn" data-action="background">' +
             '<span class="quick-icon">🖼️</span><span>换背景</span>' +
           '</button>' +
@@ -245,6 +249,7 @@
     $$('[data-action]', root).forEach((btn) => {
       const action = btn.dataset.action;
       if (action === 'wallet') btn.addEventListener('click', () => LB.App.go('/wallet'));
+      if (action === 'album') btn.addEventListener('click', () => LB.App.go('/album'));
       if (action === 'background') btn.addEventListener('click', openBackground);
       if (action === 'share') btn.addEventListener('click', openShare);
     });
@@ -256,6 +261,8 @@
         LB.Store.saveMeta(ctx().meta);
       }, 700);
     }
+
+    decorateMemories(root);
 
     /* 首次进入：给未刮开的格子挂上涂层 */
     requestAnimationFrame(() => {
@@ -438,7 +445,195 @@
         '<div class="detail-icon">' + esc(parsed.icon) + '</div>' +
         '<p class="detail-text">' + esc(parsed.text) + '</p>' +
         (line.length ? '<p class="detail-note">已连成：' + line.map((l) => esc(l.label)).join('、') + '</p>' : '<p class="detail-note">这一格还没有连线</p>') +
-      '</div>'
+        '<div class="memory-slot" data-memory-slot><p class="memory-loading">回忆加载中…</p></div>' +
+      '</div>',
+      onMount: (node) => renderMemorySlot(node.querySelector('[data-memory-slot]'), pos)
+    });
+  }
+
+  /* ---------------- 回忆册：打卡 / 编辑 / 删除 ---------------- */
+  function formatDay(ts) {
+    const d = new Date(ts);
+    return d.getFullYear() + '.' + String(d.getMonth() + 1).padStart(2, '0') + '.' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function renderMemorySlot(slot, pos) {
+    if (!slot) return;
+    LB.Album.get(ctx().profile.uid, pos)
+      .then((entry) => paintMemorySlot(slot, pos, entry))
+      .catch(() => {
+        if (slot && document.body.contains(slot)) {
+          slot.innerHTML = '<p class="sheet-note">这个浏览器暂时用不了回忆册</p>';
+        }
+      });
+  }
+
+  function paintMemorySlot(slot, pos, entry) {
+    if (!slot || !document.body.contains(slot)) return;
+    if (!entry) {
+      slot.innerHTML =
+        '<button class="btn btn-ghost btn-block" data-checkin>📷 给这一格留个纪念</button>' +
+        '<p class="sheet-note center">照片和心情只保存在这台手机上</p>';
+      slot.querySelector('[data-checkin]').addEventListener('click', () => openCheckin(slot, pos, null));
+      return;
+    }
+    slot.innerHTML =
+      '<div class="memory-card">' +
+        (entry.photo ? '<img class="memory-photo" src="' + entry.photo + '" alt="回忆照片">' : '') +
+        (entry.note ? '<p class="memory-note">' + esc(entry.note) + '</p>' : '') +
+        '<div class="memory-meta">' + formatDay(entry.at) + ' 记下</div>' +
+        '<div class="row-btns">' +
+          '<button class="btn btn-ghost" data-edit>编辑</button>' +
+          '<button class="btn btn-ghost" data-del>删除</button>' +
+        '</div>' +
+      '</div>';
+    slot.querySelector('[data-edit]').addEventListener('click', () => openCheckin(slot, pos, entry));
+    slot.querySelector('[data-del]').addEventListener('click', () => {
+      LB.UI.confirm({ title: '删除这条回忆？', message: '照片和文字都会从这台手机上移除。', okText: '删除', danger: true })
+        .then((ok) => {
+          if (!ok) return;
+          LB.Album.remove(ctx().profile.uid, pos).then(() => {
+            paintMemorySlot(slot, pos, null);
+            decorateMemories($('.screen-play'));
+            toast('已删除', { icon: '🧹' });
+          });
+        });
+    });
+  }
+
+  function openCheckin(slot, pos, entry) {
+    const note = entry ? entry.note : '';
+    const existingPhoto = entry ? entry.photo : '';
+    slot.innerHTML =
+      '<div class="checkin-form">' +
+        '<div class="checkin-photo" data-preview>' +
+          (existingPhoto ? '<img src="' + existingPhoto + '" alt="照片预览">' : '<span>还没有照片</span>') +
+        '</div>' +
+        '<button class="btn btn-ghost btn-block" data-pick>📷 选择照片</button>' +
+        '<textarea class="input" rows="2" maxlength="80" data-note placeholder="写一句当时的心情…">' + esc(note) + '</textarea>' +
+        '<div class="row-btns">' +
+          '<button class="btn btn-ghost" data-cancel>取消</button>' +
+          '<button class="btn btn-primary" data-save>保存</button>' +
+        '</div>' +
+        '<input type="file" accept="image/*" data-file hidden>' +
+      '</div>';
+
+    let photo = existingPhoto;
+    const fileInput = slot.querySelector('[data-file]');
+    const preview = slot.querySelector('[data-preview]');
+    const noteInput = slot.querySelector('[data-note]');
+
+    slot.querySelector('[data-pick]').addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files && fileInput.files[0];
+      fileInput.value = '';
+      if (!file) return;
+      preview.innerHTML = '<span>处理中…</span>';
+      LB.Theme.compressImage(file, { maxSize: 900, quality: 0.76 }).then((dataUrl) => {
+        photo = dataUrl;
+        preview.innerHTML = '<img src="' + dataUrl + '" alt="照片预览">';
+      }).catch(() => {
+        preview.innerHTML = '<span>这张图读不出来，换一张试试</span>';
+      });
+    });
+
+    slot.querySelector('[data-cancel]').addEventListener('click', () => paintMemorySlot(slot, pos, entry));
+
+    slot.querySelector('[data-save]').addEventListener('click', () => {
+      const text = (noteInput.value || '').trim();
+      if (!photo && !text) {
+        toast('选一张照片，或者写一句话', { tone: 'warn' });
+        return;
+      }
+      LB.Album.put(ctx().profile.uid, pos, { photo: photo, note: text }).then((saved) => {
+        paintMemorySlot(slot, pos, saved);
+        decorateMemories($('.screen-play'));
+        haptic([10, 40, 10]);
+        toast('记下啦，以后翻得到 💕', { icon: '📷' });
+      }).catch(() => toast('保存失败，可能是空间不够了', { tone: 'warn' }));
+    });
+  }
+
+  function decorateMemories(root) {
+    if (!root || !ctx().profile) return;
+    LB.Album.all(ctx().profile.uid).then((list) => {
+      const map = {};
+      list.forEach((item) => { map[item.pos] = item; });
+      $$('.cell', root).forEach((cell) => {
+        const pos = Number(cell.dataset.pos);
+        const has = !!map[pos] && cell.dataset.revealed === '1';
+        cell.classList.toggle('has-memory', has);
+        let dot = cell.querySelector('.memory-dot');
+        if (has && !dot) {
+          dot = document.createElement('span');
+          dot.className = 'memory-dot';
+          dot.setAttribute('aria-hidden', 'true');
+          dot.innerHTML = '<svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="#fff" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"><path d="M4 8h3l1.6-2h6.8L17 8h3v10H4z"/><circle cx="12" cy="13" r="2.8"/></svg>';
+          cell.appendChild(dot);
+        }
+        if (!has && dot) dot.remove();
+      });
+      const badge = root.querySelector('[data-memory-badge]');
+      if (badge) {
+        badge.textContent = list.length;
+        badge.hidden = list.length === 0;
+      }
+    }).catch(() => { /* 相册不可用时安静降级 */ });
+  }
+
+  /* ---------------- 回忆册页面 ---------------- */
+  function renderAlbum(root) {
+    const uid = ctx().profile.uid;
+    root.innerHTML =
+      '<div class="screen screen-album">' +
+        '<div class="topbar">' +
+          '<button class="icon-btn" data-back aria-label="返回">←</button>' +
+          '<span class="chip chip-soft">回忆册</span>' +
+          '<button class="icon-btn" data-play aria-label="去刮卡">🎴</button>' +
+        '</div>' +
+        '<header class="wallet-head">' +
+          '<h1 class="wallet-title">我们的回忆册</h1>' +
+          '<p class="wallet-sub">刮开一格，就给它留一张照片和一句话</p>' +
+        '</header>' +
+        '<div class="album-body" data-album-body><p class="memory-loading">正在翻相册…</p></div>' +
+      '</div>';
+
+    root.querySelector('[data-back]').addEventListener('click', () => LB.App.go('/play'));
+    root.querySelector('[data-play]').addEventListener('click', () => LB.App.go('/play'));
+
+    const body = root.querySelector('[data-album-body]');
+    LB.Album.all(uid).then((list) => {
+      if (!list.length) {
+        body.innerHTML =
+          '<div class="empty">' +
+            '<div class="empty-icon">📷</div>' +
+            '<p class="empty-title">回忆册还是空的</p>' +
+            '<p class="empty-sub">回到卡片，点一下已经刮开的格子<br>就能记录照片和当时的心情</p>' +
+            '<button class="btn btn-primary" data-go>去刮卡</button>' +
+          '</div>';
+      } else {
+        body.innerHTML =
+          '<div class="album-stats">已记录 <b>' + list.length + '</b> / 24 格</div>' +
+          '<div class="album-grid">' +
+            list.map((item) => {
+              const parsed = LB.Game.parseTask(ctx().game.taskAt(item.pos));
+              return '<button class="album-item" data-pos="' + item.pos + '">' +
+                (item.photo
+                  ? '<img src="' + item.photo + '" alt="' + esc(parsed.text) + '">'
+                  : '<span class="album-nophoto">' + esc(parsed.icon) + '</span>') +
+                '<span class="album-cap">第 ' + cellNumber(item.pos) + ' 格 · ' + esc(parsed.text) + '</span>' +
+              '</button>';
+            }).join('') +
+          '</div>' +
+          '<p class="sheet-note center">点开可以看大图、修改或删除</p>';
+      }
+      body.querySelectorAll('.album-item').forEach((btn) => {
+        btn.addEventListener('click', () => openCellDetail(Number(btn.dataset.pos)));
+      });
+      const go = body.querySelector('[data-go]');
+      if (go) go.addEventListener('click', () => LB.App.go('/play'));
+    }).catch(() => {
+      body.innerHTML = '<p class="empty-sub">这个浏览器暂时打不开回忆册</p>';
     });
   }
 
@@ -478,7 +673,7 @@
               setTimeout(() => mount($('#app')), 220);
             }
             if (key === 'reset') {
-              LB.UI.confirm({ title: '重新开始？', message: '这一张卡的刮开进度和已收集的券都会被清空，确定吗？', okText: '重新开始', danger: true })
+              LB.UI.confirm({ title: '重新开始？', message: '这一张卡的刮开进度和已收集的券会被清空；回忆册里的照片会保留。确定吗？', okText: '重新开始', danger: true })
                 .then((ok) => {
                   if (!ok) return;
                   closeSheet();
@@ -759,5 +954,5 @@
     });
   }
 
-  LB.Player = { mount, renderGame, renderWallet, openSettings, openBackground, openShare };
+  LB.Player = { mount, renderGame, renderWallet, renderAlbum, openSettings, openBackground, openShare };
 })(window.LB = window.LB || {});

@@ -228,6 +228,16 @@
       const act = btn.dataset.act;
       const profile = ctx().profile;
 
+      if (act === 'apply-template') {
+        const tpl = LB.DATA.TEMPLATES.filter((t) => t.id === btn.dataset.id)[0];
+        if (!tpl) return;
+        confirm({
+          title: '套用「' + tpl.name + '」模板？',
+          message: '24 个任务、中心格、奖励券和建议配色会被替换；名字、纪念日与合照保留。',
+          okText: '套用模板'
+        }).then((ok) => { if (ok) applyTemplate(tpl); });
+        return;
+      }
       if (act === 'shuffle') {
         const pool = LB.DATA.TASK_LIBRARY.slice();
         for (let i = pool.length - 1; i > 0; i--) {
@@ -284,10 +294,46 @@
     });
   }
 
+  /* ---------------- 模板 ---------------- */
+  function templateSection() {
+    return (
+      '<div class="studio-section">' +
+        '<h3 class="sec-title">一键套用模板</h3>' +
+        '<p class="sec-desc">整组任务 + 奖励券 + 建议配色；名字、纪念日和合照不会被改掉</p>' +
+        '<div class="template-row">' +
+          LB.DATA.TEMPLATES.map((t) =>
+            '<button class="template-card" data-act="apply-template" data-id="' + t.id + '">' +
+              '<span class="tpl-emoji">' + t.emoji + '</span>' +
+              '<span class="tpl-name">' + esc(t.name) + '</span>' +
+              '<span class="tpl-desc">' + esc(t.desc) + '</span>' +
+            '</button>'
+          ).join('') +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function applyTemplate(tpl) {
+    const p = ctx().profile;
+    p.tasks = tpl.tasks.slice();
+    p.center = tpl.center;
+    p.coupons = tpl.coupons.map((c) => ({ emoji: c.emoji, title: c.title, desc: c.desc }));
+    if (tpl.theme) {
+      p.theme.id = tpl.theme;
+      p.theme.accent = '';
+      p.theme.accent2 = '';
+    }
+    LB.Store.saveProfile(p);
+    LB.Theme.apply(p, ctx().photo);
+    renderTab($('#app'));
+    toast('已套用「' + tpl.name + '」模板，可以继续微调', { icon: '✨' });
+  }
+
   /* ---------------- 内容 ---------------- */
   function contentTab() {
     const p = ctx().profile;
     return (
+      templateSection() +
       '<div class="studio-section">' +
         '<h3 class="sec-title">关于你们</h3>' +
         '<p class="sec-desc">会出现在卡片顶部和分享海报上</p>' +
@@ -596,7 +642,7 @@
     });
 
     on('clear-progress', () => {
-      confirm({ title: '清空刮卡进度？', message: '使用者已刮开的格子、收集的券都会清空，卡片内容不受影响。', okText: '清空进度', danger: true })
+      confirm({ title: '清空刮卡进度？', message: '使用者已刮开的格子、收集的券都会清空；回忆册里的照片会保留。卡片内容不受影响。', okText: '清空进度', danger: true })
         .then((ok) => {
           if (!ok) return;
           const state = LB.Store.defaultState();

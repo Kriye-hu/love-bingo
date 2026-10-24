@@ -21,6 +21,17 @@
 
   const clone = (v) => JSON.parse(JSON.stringify(v));
 
+  /* 卡片实例 id：只在本机有意义，照片按它归档；不会写进分享链接 */
+  function randomId(length) {
+    const chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+    const buf = new Uint8Array(length || 10);
+    if (window.crypto && window.crypto.getRandomValues) window.crypto.getRandomValues(buf);
+    else for (let i = 0; i < buf.length; i++) buf[i] = Math.floor(Math.random() * 256);
+    let out = '';
+    for (let i = 0; i < buf.length; i++) out += chars[buf[i] % chars.length];
+    return out;
+  }
+
   function safeGet(key) {
     try { return localStorage.getItem(key); } catch (e) { return null; }
   }
@@ -34,6 +45,7 @@
   function defaultProfile() {
     return {
       v: 2,
+      uid: randomId(10),
       couple: { a: '阿狸', b: '桃子' },
       title: '我们的恋爱 Bingo',
       subtitle: '刮一刮 · 心动一下',
@@ -78,6 +90,7 @@
     const base = defaultProfile();
     if (!raw || typeof raw !== 'object') return base;
     const p = Object.assign(base, raw);
+    if (!p.uid || typeof p.uid !== 'string') p.uid = randomId(10);
     p.couple = Object.assign({ a: '阿狸', b: '桃子' }, raw.couple || {});
     p.theme = Object.assign(base.theme, raw.theme || {});
     p.access = Object.assign({ mode: 'open', pin: '' }, raw.access || {});
@@ -265,7 +278,7 @@
   }
 
   LB.Store = {
-    KEY, ORDER, CENTER,
+    KEY, ORDER, CENTER, randomId,
     defaultProfile, defaultState, defaultMeta, normalizeProfile, normalizeState,
     migrateLegacy,
     loadProfile, saveProfile, loadState, saveState,

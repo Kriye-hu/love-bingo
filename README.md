@@ -32,6 +32,8 @@
 制作者可以改掉全部内容——名字、任务、奖励券、配色，甚至**用你们的合照当背景**，
 然后把「专属链接」发给对方。对方打开就是一张为你们做的卡，**不需要注册、不需要服务器**。
 
+刮开之后，点一下格子还能给它补一张照片和一句话，慢慢攒成只属于你们的**回忆册**。
+
 ---
 
 ## ✨ 功能
@@ -40,11 +42,13 @@
 |---|---|
 | 👆 **真·刮开** | Canvas 涂层 + 手指擦除，刮掉 40% 自动揭开；Web Audio 沙沙声 + 震动反馈 |
 | 🛠️ **两种身份** | **制作者**用密码进工作台改内容；**使用者**选「我是谁」后开刮，进度各自独立 |
+| 🧩 **一键模板** | 异地恋 / 同居日常 / 周年纪念 / 长跑情侣，整组任务 + 奖励券 + 配色一键套用，名字和合照保留 |
 | 🔗 **专属链接** | 名字、任务、券、配色全部编码进链接（deflate + base64url，约 1.4 KB），发出去就能打开 |
 | 🔐 **访问口令** | 不想被转发？开一个 4 位口令，只有知道的人能进 |
 | 🖼️ **合照背景** | 上传你们的照片当背景，可调模糊与柔光；照片只留在本机，不会上传也不进链接 |
 | 🎨 **5 套主题** | 蜜桃奶油 / 樱花微醺 / 落日橘光 / 薄荷清甜 / 星夜私语，主色辅色和底纹都能微调 |
 | 🎟️ **12 条线 = 12 张券** | 横、竖、两条对角线，多线同时达成会依次开券；券包可标记「已兑现」 |
+| 📷 **回忆册** | 刮开之后，点一下格子就能补一张照片和一句话；照片存本机 IndexedDB，可编辑、删除，随时翻看 |
 | 🖼️ **纪念海报** | 一键把当前进度画成 1080×1620 的分享图，带连线高亮 |
 | 📴 **可安装、可离线** | PWA：添加到主屏幕全屏打开，断网也能玩；新版本自动更新提示 |
 | 🔒 **数据不出手机** | 无账号、无后端、无统计、无第三方请求；localStorage 存进度，可导出 JSON 备份 |
@@ -66,12 +70,17 @@
   <td align="center"><img src="docs/poster.jpg" width="230"><br><sub>纪念海报</sub></td>
 </tr>
 <tr>
-  <td align="center"><img src="docs/studio-content.jpg" width="230"><br><sub>制作者工作台</sub></td>
+  <td align="center"><img src="docs/memory.jpg" width="230"><br><sub>给刮开的格子打卡</sub></td>
+  <td align="center"><img src="docs/album.jpg" width="230"><br><sub>慢慢攒成回忆册</sub></td>
+  <td align="center"><img src="docs/night-play.jpg" width="230"><br><sub>星夜主题</sub></td>
+</tr>
+<tr>
+  <td align="center"><img src="docs/studio-content.jpg" width="230"><br><sub>制作者工作台 + 一键模板</sub></td>
   <td align="center"><img src="docs/studio-photo.jpg" width="230"><br><sub>上传合照、调模糊</sub></td>
   <td align="center"><img src="docs/studio-share.jpg" width="230"><br><sub>专属链接 + 访问口令</sub></td>
 </tr>
 <tr>
-  <td align="center"><img src="docs/night-play.jpg" width="230"><br><sub>星夜主题</sub></td>
+  <td align="center"><img src="docs/photo-play.jpg" width="230"><br><sub>用合照做背景</sub></td>
   <td align="center"><img src="docs/import-pin.jpg" width="230"><br><sub>口令卡</sub></td>
   <td align="center"><img src="docs/small.jpg" width="230"><br><sub>小屏 360px 也不挤</sub></td>
 </tr>
@@ -199,8 +208,9 @@ python -m http.server 8080
 ## 🗺️ Roadmap
 
 - [x] v2.0：双角色、专属链接、合照背景、券包、海报、PWA
+- [x] v2.1：一键模板（异地恋 / 同居 / 周年 / 长跑）+ 回忆册（打卡照片）
 - [ ] 双人实时同步（可选自带 Supabase / WebRTC，仍保持「不注册也能玩」）
-- [ ] 任务库按场景分组（异地恋 / 同居 / 纪念日）
+- [ ] 更多模板 + 社区投稿的模板包
 - [ ] 更多底纹与字体，自定义卡片标题字体
 - [ ] 多语言（EN / JA / KO）
 - [ ] 把海报做成可切换的 3 种版式

@@ -2,7 +2,7 @@
    恋爱刮刮 Bingo · Service Worker
    离线可用：页面与资源缓存，访问时优先取新版本
    ========================================================== */
-const VERSION = '2.0.0';
+const VERSION = '2.1.0';
 const CACHE = 'love-bingo-' + VERSION;
 
 const CORE = [
@@ -15,6 +15,7 @@ const CORE = [
   './assets/js/codec.js',
   './assets/js/ui.js',
   './assets/js/theme.js',
+  './assets/js/album.js',
   './assets/js/scratch.js',
   './assets/js/game.js',
   './assets/js/poster.js',
